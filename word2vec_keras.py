@@ -1,29 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Sep  9 17:14:56 2018
-
-@author: Mohamed Hammad
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Sep  8 17:50:40 2018
-
-@author: Mohamed Hammad
-"""
-
 import pandas as pd
 import spacy
-#from spacy import displacy
 import numpy as np
 from keras.preprocessing.text import Tokenizer
-#from spacy.lang.en.stop_words import STOP_WORDS
 from keras.utils import to_categorical
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential
 from keras.layers import GRU,Dropout, BatchNormalization,Dense, GlobalMaxPooling1D, Embedding, Flatten,Bidirectional,LSTM,SpatialDropout1D
 from gensim.models import Word2Vec
-#from gensim.corpora import Dictionary
 from keras.optimizers import Adam
 from keras.regularizers import l2
 import keras.backend as K
@@ -41,7 +24,7 @@ for i in combined.SentenceId.unique():
     sentences.append(combined.loc[combined.SentenceId==i]['Phrase'].iloc[0])
 
 #TRAINING THE WORD2VEC MODEL
-# preprocess text
+#preprocess text
 #prepare stopwords
 with open('stopwords.txt') as f:
     stopwords=f.readlines()
@@ -103,59 +86,25 @@ ytest=to_categorical(train.Sentiment.iloc[140000:156060])
 print("shape of xtrain:", embedding_matrix.shape)
 
 # define model
-'''model = Sequential()
+model = Sequential()
 e = Embedding(vocab_size, 300, weights=[embedding_matrix],embeddings_regularizer='l1', input_length=56, trainable=True)
 model.add(e)
-#model.add(SpatialDropout1D(0.4))
 model.add(Bidirectional(LSTM(50,return_sequences=True),input_shape=(56,300)))
-#model.add(GlobalMaxPooling1D())
-#spatial dropout layer
 model.add(Flatten())
 model.add(Dense(50, activation='elu'))
 model.add(Dense(5, activation='softmax'))
 #model.load_weights("model.h5")
-
 # compile the model
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 model.fit(xtrain, ytrain, batch_size=1000,validation_split = 0.05, epochs=6,verbose=2)
-model_sp = Sequential()
-model_sp.add(Embedding(vocab_size, 300,input_length = 56, weights=[embedding_matrix], trainable=True))
-model_sp.add(SpatialDropout1D(0.4))
-model_sp.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
-model_sp.add(Dense(50,activation='elu'))
-model_sp.add(Dense(5,activation='softmax'))
-#model_sp.load_weights("model_sp.h5")
-model_sp.compile(loss = 'categorical_crossentropy', optimizer='adam',metrics = ['accuracy'])
-# fit the model
 epochs = 100
-history = model_sp.fit(xtrain, ytrain, batch_size=1000,validation_split = 0.10, epochs=epochs,verbose=2)'''
-'''model_rob= Sequential()
-e = Embedding(vocab_size, 500, weights=[embedding_matrix],embeddings_regularizer='l1', input_length=56, trainable=True)
-model_rob.add(e)
-model_rob.add(SpatialDropout1D(0.2))
-model_rob.add(Bidirectional(LSTM(64)))
-model_rob.add(Dropout(0.5))
-model_rob.add(BatchNormalization())
-model_rob.add(Dense(5, activation='softmax'))
-#model_rob.load_weights('model_rob500.h5')
-model_rob.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-#evaluate the model'''
-model4 = Sequential()
+history = model.fit(xtrain, ytrain, batch_size=1000,validation_split = 0.10, epochs=epochs,verbose=2)'''
 
-model4.add(Embedding(vocab_size, 100, input_length=56))#,weights=[embedding_matrix]))
-model4.add(SpatialDropout1D(0.4))
-model4.add(Bidirectional(GRU(64)))
-model4.add(Dropout(0.5))
-model4.add(Dense(5, activation='softmax'))
-model4.load_weights('model4.h5')
-model4.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-history = model4.fit(xtrain, ytrain, batch_size=1000,validation_split = 0.07, epochs=3,verbose=2)
-
-loss, accuracy = model4.evaluate(xtrain, ytrain)
+loss, accuracy = model.evaluate(xtrain, ytrain)
 print(f'Training accuracy: {accuracy*100}%')
 
-loss, accuracy = model4.evaluate(xtest, ytest)
+loss, accuracy = model.evaluate(xtest, ytest)
 print(f'Test accuracy: {accuracy*100}%')
 
-preds=model4.predict_classes(xpred)
+preds=model.predict_classes(xpred)
 test.to_csv('predictions.csv',columns=['PhraseId','Sentiment'],index=False)
