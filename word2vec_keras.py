@@ -35,10 +35,10 @@ print('Stopwords loaded...')
 def preprocess(x):
     x=nlp(x.lower())
     tokens=[t for t in x]
-    #tokens=[t for t in tokens if t.text not in stopwords]
+    tokens=[t for t in tokens if t.text not in stopwords]
     tokens=[t.text for t in tokens if t.is_punct==False]
-    #tokens=[t for t in tokens if len(t)>=3]
-    #tokens=[t.lemma_ for t in tokens]
+    tokens=[t for t in tokens if len(t)>=3]
+    tokens=[t.lemma_ for t in tokens]
     return tokens
 print('Preprocessing...')
 processed_text=pd.Series(sentences).apply(preprocess)
